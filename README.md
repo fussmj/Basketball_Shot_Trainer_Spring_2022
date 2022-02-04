@@ -1,1 +1,5 @@
-# Basketball_Shot_Trainer_Spring_2022
+# Shot Trainer Study
+Spring 2022
+
+### Older MSD Information
+[Previous Project](https://github.com/AdamSeidman/Basketball-Shot-Trainer)

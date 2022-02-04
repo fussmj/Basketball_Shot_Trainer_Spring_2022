@@ -1,0 +1,4 @@
+(fp_lib_table
+  (lib (name LM1117IMPX-5)(type KiCad)(uri C:/Users/Adam/Documents/#Code/Basketball_Shot_Trainer/Board/#Parts/LM1117IMPX-5.0)(options "")(descr ""))
+  (lib (name 0_MSD_FPs)(type KiCad)(uri "C:/Users/Adam/Documents/#Code/Basketball_Shot_Trainer/Board/#Parts/Custom Footprints")(options "")(descr ""))
+)

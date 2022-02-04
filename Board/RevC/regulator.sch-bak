@@ -1,0 +1,139 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 5 4
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+Text HLabel 3400 2700 0    50   Input ~ 0
+Batt_In
+Text HLabel 3650 3450 0    50   Input ~ 0
+GND
+Text HLabel 6400 2950 2    50   Output ~ 0
+5V_Out
+$Comp
+L LM1117IMPX-5.0:LM1117IMPX-5.0 VR1
+U 1 1 614A1D39
+P 4950 3050
+F 0 "VR1" H 4950 3417 50  0000 C CNN
+F 1 "LM1117IMPX-5.0" H 4950 3326 50  0000 C CNN
+F 2 "LM1117IMPX-5:SOT230P700X180-4N" H 4950 3050 50  0001 L BNN
+F 3 "1.80 mm" H 4950 3050 50  0001 L BNN
+F 4 "O" H 4950 3050 50  0001 L BNN "Field4"
+F 5 "IPC 7351B" H 4950 3050 50  0001 L BNN "Field5"
+F 6 "Rochester Electronics/Texas Instruments" H 4950 3050 50  0001 L BNN "Field6"
+	1    4950 3050
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C1
+U 1 1 614A34B9
+P 3800 3150
+F 0 "C1" H 3915 3196 50  0000 L CNN
+F 1 "0.1uF" H 3915 3105 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 3838 3000 50  0001 C CNN
+F 3 "~" H 3800 3150 50  0001 C CNN
+	1    3800 3150
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C4
+U 1 1 614A3F1C
+P 6200 3650
+F 0 "C4" H 6315 3696 50  0000 L CNN
+F 1 "1uF" H 6315 3605 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 6238 3500 50  0001 C CNN
+F 3 "~" H 6200 3650 50  0001 C CNN
+	1    6200 3650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4350 2950 3800 2950
+Wire Wire Line
+	3800 2950 3800 3000
+Wire Wire Line
+	3800 2950 3800 2700
+Wire Wire Line
+	3800 2700 3400 2700
+Connection ~ 3800 2950
+Wire Wire Line
+	3800 3300 3800 3450
+Wire Wire Line
+	3800 3450 3650 3450
+Wire Wire Line
+	6400 2950 6200 2950
+$Comp
+L Device:C C3
+U 1 1 614A7535
+P 5850 3100
+F 0 "C3" H 5965 3146 50  0000 L CNN
+F 1 "1uF" H 5965 3055 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 5888 2950 50  0001 C CNN
+F 3 "~" H 5850 3100 50  0001 C CNN
+	1    5850 3100
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:C C2
+U 1 1 614A7ADA
+P 5800 3650
+F 0 "C2" H 5915 3696 50  0000 L CNN
+F 1 "1uF" H 5915 3605 50  0000 L CNN
+F 2 "Capacitor_SMD:C_0603_1608Metric" H 5838 3500 50  0001 C CNN
+F 3 "~" H 5800 3650 50  0001 C CNN
+	1    5800 3650
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:CP C5
+U 1 1 614A9413
+P 6600 3650
+F 0 "C5" H 6718 3696 50  0000 L CNN
+F 1 "4.7uF_16V" H 6718 3605 50  0000 L CNN
+F 2 "Capacitor_Tantalum_SMD:CP_EIA-3216-18_Kemet-A" H 6638 3500 50  0001 C CNN
+F 3 "~" H 6600 3650 50  0001 C CNN
+	1    6600 3650
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6600 3500 6200 3500
+Wire Wire Line
+	6200 3500 5800 3500
+Connection ~ 6200 3500
+Wire Wire Line
+	5800 3800 6200 3800
+Wire Wire Line
+	6600 3800 6200 3800
+Connection ~ 6200 3800
+Wire Wire Line
+	6200 3500 6200 2950
+Connection ~ 6200 2950
+Wire Wire Line
+	6200 2950 5550 2950
+Text HLabel 5700 3350 0    50   Input ~ 0
+GND
+Text HLabel 6100 3950 0    50   Input ~ 0
+GND
+Wire Wire Line
+	6100 3950 6200 3950
+Wire Wire Line
+	6200 3950 6200 3800
+Wire Wire Line
+	5700 3350 5850 3350
+Wire Wire Line
+	5850 3350 5850 3250
+Text HLabel 4300 3250 3    50   Input ~ 0
+GND
+Wire Wire Line
+	4300 3250 4300 3150
+Wire Wire Line
+	4300 3150 4350 3150
+$EndSCHEMATC

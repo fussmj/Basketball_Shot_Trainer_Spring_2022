@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name "Adafruit Feather M0 WiFi")(type KiCad)(uri "$(KIPRJMOD)/Adafruit Feather M0 WiFi.pretty")(options "")(descr ""))
+)

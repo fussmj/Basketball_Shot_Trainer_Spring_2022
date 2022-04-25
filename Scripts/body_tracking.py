@@ -1,63 +1,119 @@
+import os
+import argparse
 import cv2
-import mediapipe as mp
+import tflite_runtime as tf
+import tflite_runtime.interpreter as Interpreter
+from tflite_runtime.interpreter import load_delegate
+#import tensorflow as tf
 import numpy as np
+import importlib.util
+from threading import Thread
+import time
+import sys
+import pathlib
+from copy import copy
 
-class Body:
-    def __init__(self, pose):
-        self.pose = pose
-
-    def __enter__(self):
-        return
-
-    def __exit__(self):
-        return
-
+import sys
+print(sys.path.append('/root/.local/'))
 
 
-mp_drawing = mp.solutions.drawing_utils
-mp_drawing_styles = mp.solutions.drawing_styles
-mp_pose = mp.solutions.pose
 
-# For static images:
-IMAGE_FILES = ['Images/messi2.png']
-BG_COLOR = (192, 192, 192) # gray
-with mp_pose.Pose(
-    static_image_mode=True,
-    model_complexity=2,
-    enable_segmentation=True,
-    min_detection_confidence=0.5) as pose:
-  for idx, file in enumerate(IMAGE_FILES):
-    image = cv2.imread(file)
-    image_height, image_width, _ = image.shape
-    # Convert the BGR image to RGB before processing.
-    results = pose.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
 
-    if not results.pose_landmarks:
-      continue
-    print(
-        f'Nose coordinates: ('
-        f'{results.pose_landmarks.landmark[mp_pose.PoseLandmark.NOSE].x * image_width}, '
-        f'{results.pose_landmarks.landmark[mp_pose.PoseLandmark.NOSE].y * image_height})'
-    )
+# Define VideoStream class to handle streaming of video from webcam in separate processing thread
+# Source - Adrian Rosebrock, PyImageSearch: https://www.pyimagesearch.com/2015/12/28/increasing-raspberry-pi-fps-with-python-and-opencv/
+class VideoStream:
+    """Camera object that controls video streaming from the Picamera"""
+    def __init__(self,resolution=(640,480),framerate=30):
+        # Initialize the PiCamera and the camera image stream
+        #breakpoint()
+        
+        self.stream = cv2.VideoCapture(0)
+        cv2.waitKey(1000)
+        print("Camera initiated.")
+        ret = self.stream.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
+        ret = self.stream.set(3,resolution[0])
+        ret = self.stream.set(4,resolution[1])
+            
+        # Read first frame from the stream
+        (self.grabbed, self.frame) = self.stream.read()
+        #cv2.imshow('window',self.frame)
+        #cv2.waitKey(1000)
 
-    annotated_image = image.copy()
-    # Draw segmentation on the image.
-    # To improve segmentation around boundaries, consider applying a joint
-    # bilateral filter to "results.segmentation_mask" with "image".
-    condition = np.stack((results.segmentation_mask,) * 3, axis=-1) > 0.1
-    bg_image = np.zeros(image.shape, dtype=np.uint8)
-    bg_image[:] = BG_COLOR
-    annotated_image = np.where(condition, annotated_image, bg_image)
-    # Draw pose landmarks on the image.
-    mp_drawing.draw_landmarks(
-        annotated_image,
-        results.pose_landmarks,
-        mp_pose.POSE_CONNECTIONS,
-        landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
-    cv2.imwrite('/tmp/annotated_image' + str(idx) + '.png', annotated_image)
-    cv2.imshow("Output", annotated_image)
-    # 20 ms between frames. Replace this with a more accurate number when it matters
-    k = cv2.waitKey(0)
-    # Plot pose world landmarks.
-    mp_drawing.plot_landmarks(
-        results.pose_world_landmarks, mp_pose.POSE_CONNECTIONS)
+    # Variable to control when the camera is stopped
+        self.stopped = False
+
+    def start(self):
+    # Start the thread that reads frames from the video stream
+        Thread(target=self.update,args=()).start()
+        return self
+
+    def update(self):
+        # Keep looping indefinitely until the thread is stopped
+        while True:
+            # If the camera is stopped, stop the thread
+            if self.stopped:
+                # Close camera resources
+                self.stream.release()
+                return
+
+            # Otherwise, grab the next frame from the stream
+            (self.grabbed, self.frame) = self.stream.read()
+
+    def read(self):
+    # Return the most recent frame
+        return self.frame
+
+    def stop(self):
+    # Indicate that the camera and thread should be stopped
+        self.stopped = True
+
+
+MODEL_NAME = 'models/lite-model_movenet_singlepose_lightning_tflite_float16_4.tflite'
+#GRAPH_NAME = args.graph
+#LABELMAP_NAME = args.labels
+min_conf_threshold = 0.5
+resW, resH = 1280, 720
+imW, imH = int(resW), int(resH)
+use_TPU = False
+
+# Get path to current working directory
+CWD_PATH = os.getcwd()
+
+# Path to .tflite file, which contains the model that is used for object detection
+PATH_TO_CKPT = os.path.join(CWD_PATH,MODEL_NAME)
+
+#load in the model
+interpreter = Interpreter.Interpreter(model_path=PATH_TO_CKPT)
+print('model loaded successfully')
+
+#determine intput shape
+interpreter.allocate_tensors()
+_, height, width, _ = interpreter.get_input_details()[0]['shape']
+print('input image shape (', width, ',', height, ')')
+
+
+
+
+
+# Get model details
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
+
+frame_rate_calc = 1
+freq = cv2.getTickFrequency()
+videostream = VideoStream(resolution=(imW,imH),framerate=30).start()
+time.sleep(1)
+
+
+while True:
+    #print('running loop')
+    # Start timer (for calculating frame rate)
+    t1 = cv2.getTickCount()
+    
+    # Grab frame from video stream
+    frame = videostream.read()
+    try:
+        cv2.imshow('frame', frame)
+        cv2.waitKey(33)
+    except:
+        print(frame)

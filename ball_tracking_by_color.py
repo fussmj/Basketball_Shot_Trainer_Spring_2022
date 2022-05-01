@@ -1,18 +1,21 @@
 import cv2
 import numpy as np
 
+#establish video feed
 cap = cv2.VideoCapture(0)
-#hsv_orange = cv2.inRange(hsv, (7,180,180), (11, 255, 255))
 
+#create windows for vizualization
 cv2.namedWindow('HueComp')
 cv2.namedWindow('SatComp')
 cv2.namedWindow('ValComp')
 cv2.namedWindow('Enable')
 cv2.namedWindow('Erosion and Dilation')
 
-
+# define a blank method because one is required for tracker bar creation
 def nothing(input):
     pass
+
+# Create tracker bars for adjusting values during program exacution
 cv2.createTrackbar('hmin', 'HueComp', 120, 255, nothing)
 cv2.createTrackbar('hmax', 'HueComp', 130, 255, nothing)
 
@@ -43,13 +46,13 @@ try:
         # Take each frame
         _, im = cap.read()
 
-        # Convert BGR to HSV
+        # Convert RGB to HSV
         hsv = cv2.cvtColor(im, cv2.COLOR_RGB2HSV)
         
-        #get 3 variables for adjusting individually
+        # get 3 variables for adjusting individually
         hue,sat,val = cv2.split(hsv)
 
-        #get tracker bar values
+        # get tracker bar values
         hmn = cv2.getTrackbarPos('hmin','HueComp')
         hmx = cv2.getTrackbarPos('hmax','HueComp')
 
@@ -64,11 +67,12 @@ try:
         
         blur_size = 2*cv2.getTrackbarPos('blur','Erosion and Dilation') + 1
         
+        # number of iterations if the morphologyEx method is used
         iterations = cv2.getTrackbarPos('iterations','Erosion and Dilation')
         
         morphex = cv2.getTrackbarPos('test','Enable')
         
-        #adjust outputs based on updated tracker bar values
+        # adjust outputs based on updated tracker bar values
         hthresh = cv2.inRange(np.array(hue),np.array(hmn),np.array(hmx))
         sthresh = cv2.inRange(np.array(sat),np.array(smn),np.array(smx))
         vthresh = cv2.inRange(np.array(val),np.array(vmn),np.array(vmx))
@@ -79,21 +83,21 @@ try:
         # Threshold the HSV image to get only orange colors
         
         mask = cv2.bitwise_and(hthresh,cv2.bitwise_and(sthresh,vthresh))
-        #mask = cv2.inRange(hsv, lower, upper)
+        # mask = cv2.inRange(hsv, lower, upper)
 
         # Bitwise-AND mask and original image
         res = cv2.bitwise_and(im,im, mask= mask)
         
-        # Perform opening to remove smaller elements
+        # Create kernels for erosion and dilation
         erosion = np.ones((erosion_size,erosion_size)).astype(np.uint8)
         dilation = np.ones((dilation_size,dilation_size)).astype(np.uint8)
         
+        # perform erosion and dilation(opening)
         im_hsv = mask.copy()
+        im_hsv = cv2.erode(im_hsv, erosion)
+        im_hsv = cv2.dilate(im_hsv, dilation)
         
-        for i in range(iterations):
-            im_hsv = cv2.erode(im_hsv, erosion)
-            im_hsv = cv2.dilate(im_hsv, dilation)
-        
+        #perform if the slider is toggled to 1. Allows you to turn it off while video is streaming in real time
         if morphex == 1:
             kernel = np.ones((blur_size,blur_size),np.uint8)
             im_hsv = cv2.morphologyEx(im_hsv, cv2.MORPH_CLOSE, kernel,iterations=iterations)

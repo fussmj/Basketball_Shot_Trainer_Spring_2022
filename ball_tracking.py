@@ -4,6 +4,10 @@ import numpy as np
 #establish video feed
 cap = cv2.VideoCapture(0)
 
+# Reduce the size of video to 320x240 so rpi can process faster
+cap.set(3,320)
+cap.set(4,240)
+
 #create windows for vizualization
 cv2.namedWindow('HueComp')
 cv2.namedWindow('SatComp')
@@ -34,10 +38,6 @@ cv2.createTrackbar('test', 'Enable', 1, 1, nothing)
 cv2.createTrackbar('blur', 'Erosion and Dilation', 2, 10, nothing)
 
 cv2.createTrackbar('iterations', 'Erosion and Dilation', 1, 10, nothing)
-
-
-
-
 
 
 try:

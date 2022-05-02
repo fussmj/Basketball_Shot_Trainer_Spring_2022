@@ -1,16 +1,57 @@
 #import libraries
 import numpy as np
 import cv2
-import Image_Processing_Classes as ip
-from matplotlib import pyplot as plt
-import mediapipe as mp
-import math
 import os
-import imutils
-from IPython.display import Image
+from threading import Thread
 
 
-class BST_Image_Proc:
+# Define VideoStream class to handle streaming of video from webcam in separate processing thread
+# Source - Adrian Rosebrock, PyImageSearch: https://www.pyimagesearch.com/2015/12/28/increasing-raspberry-pi-fps-with-python-and-opencv/
+class VideoStream:
+    """Camera object that controls video streaming from the Picamera"""
+    def __init__(self,resolution=(320,240),framerate=30):
+        # Initialize the PiCamera and the camera image stream
+        #breakpoint()
+        
+        self.stream = cv2.VideoCapture(0)
+        cv2.waitKey(1000)
+        print("Camera initiated.")
+        ret = self.stream.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
+        ret = self.stream.set(3,resolution[0])
+        ret = self.stream.set(4,resolution[1])
+            
+        # Read first frame from the stream
+        (self.grabbed, self.frame) = self.stream.read()
+
+    # Variable to control when the camera is stopped
+        self.stopped = False
+
+    def start(self):
+    # Start the thread that reads frames from the video stream
+        Thread(target=self.update,args=()).start()
+        return self
+
+    def update(self):
+        # Keep looping indefinitely until the thread is stopped
+        while True:
+            # If the camera is stopped, stop the thread
+            if self.stopped:
+                # Close camera resources
+                self.stream.release()
+                return
+
+            # Otherwise, grab the next frame from the stream
+            (self.grabbed, self.frame) = self.stream.read()
+
+    def read(self):
+    # Return the most recent frame
+        return self.frame
+
+    def stop(self):
+    # Indicate that the camera and thread should be stopped
+        self.stopped = True
+
+""" class BST_Image_Proc:
     #this class will serve as a way to incorporate multiple image processing libraries
     def __init__(self):
         self.vid = cv2.VideoCapture(0)
@@ -26,11 +67,7 @@ class BST_Image_Proc:
     
     
     def initialize_yolo(self):
-        """
-        Function to initialise the weights, architecture, and labels for the yolo model
-
-        :return: yolo model, yolo model output layer names, model labels (ball, person, etc.)
-        """
+  
         yolo_dir = os.path.abspath("./yolo")
 
         # load the labels, weights, and config for the yolo model
@@ -116,4 +153,4 @@ class BST_Image_Proc:
             self.ball.pose_landmarks,
             self.mp_pose.POSE_CONNECTIONS,
             landmark_drawing_spec=self.mp_styles.get_default_pose_landmarks_style())
-            #annotated_image = cv2.cvtColor(annotated_image, cv2.COLOR_BGR2RGB)
+            #annotated_image = cv2.cvtColor(annotated_image, cv2.COLOR_BGR2RGB) """
